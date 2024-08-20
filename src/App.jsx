@@ -1,13 +1,13 @@
 import React from 'react'
-import { WelcomeScreen } from './welcomeScreen'
+import { Settings } from './components/settings'
 
 export const App = () => {
 
   return (
     <div>
-      <WelcomeScreen/>
+      <Settings/>
     </div>
   )
 }
 
-
+export default App;
