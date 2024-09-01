@@ -6,6 +6,7 @@ import {
   Button,
   VStack,
 } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 export const ResultsPage = () => {
   
@@ -18,13 +19,18 @@ export const ResultsPage = () => {
     time: '5 minutes',
     difficulty: 'Medium',
   };
+  const navigate = useNavigate();
+
+  const handleStartQuiz = () =>{
+    
+  }
 
   const handleRestart = () => {
-    console.log('Restarting quiz...');
+    navigate('/quiz');
   };
 
   const handleChooseAnotherQuiz = () => {
-    console.log('Choose antoher quiz...');
+    navigate('/');
   };
 
   return (

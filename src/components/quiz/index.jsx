@@ -10,13 +10,19 @@ import {
   SimpleGrid,
   useDisclosure,
 } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 export const QuizPage = () => {
   const [timer, setTimer] = useState(60); 
   const [questionNumber, setQuestionNumber] = useState(3); 
   const [totalQuestions] = useState(6); 
   const [answers] = useState(['True', 'False']); 
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  
+  const navigate = useNavigate();
+
+  const onClose = () =>{
+    navigate('/results');
+  }
 
   useEffect(() => {
     if (timer === 0) return;
@@ -51,7 +57,7 @@ export const QuizPage = () => {
           ))}
         </SimpleGrid>
 
-        <Button colorScheme="red" onClick={onOpen}>
+        <Button colorScheme="red" onClick={onClose}>
           End Quiz
         </Button>
 

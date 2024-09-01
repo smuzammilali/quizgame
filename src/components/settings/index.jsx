@@ -1,7 +1,16 @@
 import React from 'react';
 import { Box, Heading, FormLabel, Input, Select, Button, Flex } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 export const Settings = () => {
+  const navigate = useNavigate();
+
+  const handleStartQuiz = () =>{
+    navigate('/quiz');
+  }
+  const handlSeeStats = () => {
+    navigate('/results');
+  }
   return (
     <Box maxW="400px" mx="auto" p="20px" textAlign="center">
       <Heading as="h1" mb="6">
@@ -56,8 +65,8 @@ export const Settings = () => {
       </Box>
 
       <Flex justify="space-between" mt="4">
-        <Button colorScheme="blue">Start Quiz</Button>
-        <Button colorScheme="blue" variant="outline">
+        <Button colorScheme="blue" onClick={handleStartQuiz}>Start Quiz</Button>
+        <Button colorScheme="blue" variant="outline" onClick={handlSeeStats}>
           See My Statistics
         </Button>
       </Flex>
