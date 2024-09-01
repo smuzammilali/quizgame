@@ -1,6 +1,7 @@
 import React from 'react'
 import { Settings } from './components/settings'
 import { QuizPage } from './components/quiz'
+import { ResultsPage } from './components/results'
 
 export const App = () => {
 
@@ -8,6 +9,7 @@ export const App = () => {
     <div>
       <Settings/>
       <QuizPage/>
+      <ResultsPage/>
     </div>
   )
 }
