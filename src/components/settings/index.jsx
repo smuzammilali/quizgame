@@ -1,77 +1,133 @@
-import React from 'react';
-import { Box, Heading, FormLabel, Input, Select, Button, Flex } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Box, Button, FormControl, FormLabel, Input, Select, VStack, Heading } from '@chakra-ui/react';
+import { fetchCategories, setQuizConfig, fetchQuestions } from '../../store/slices/quizSlice';
 import { useNavigate } from 'react-router-dom';
 
 export const Settings = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const categories = useSelector((state) => state.quiz.categories);
+  
+  const [numQuestions, setNumQuestions] = useState(5);
+  const [category, setCategory] = useState('');
+  const [difficulty, setDifficulty] = useState('easy');
+  const [type, setType] = useState('multiple');
+  const [time, setTime] = useState(60); 
 
-  const handleStartQuiz = () =>{
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  const handleStartQuiz = () => {
+    const config = {
+      numQuestions,
+      category,
+      difficulty,
+      type,
+      time, 
+    };
+
+    dispatch(setQuizConfig(config));
+    dispatch(fetchQuestions(config));
     navigate('/quiz');
-  }
-  const handlSeeStats = () => {
-    navigate('/results');
-  }
+  };
+
   return (
-    <Box maxW="400px" mx="auto" p="20px" textAlign="center">
-      <Heading as="h1" mb="6">
-        Welcome to the Quiz
+    <Box maxW="md" mx="auto" mt="8" p="6" bg="gray.700" borderRadius="md" boxShadow="xl">
+      <Heading as="h2" size="lg" mb="6" textAlign="center" color="white">
+        Quiz Settings
       </Heading>
 
-      <Box mb="4">
-        <FormLabel htmlFor="number-of-questions">Number of Questions</FormLabel>
-        <Input
-          id="number-of-questions"
-          type="number"
-          placeholder="Enter a number between 5 and 15"
-          min="5"
-          max="15"
-        />
-      </Box>
+      <VStack spacing="4">
+        {/* Number of Questions */}
+        <FormControl id="numQuestions" isRequired>
+          <FormLabel color="white">Number of Questions</FormLabel>
+          <Input
+            type="number"
+            min={5}
+            max={15}
+            value={numQuestions}
+            onChange={(e) => setNumQuestions(e.target.value)}
+            bg="gray.600"
+            color="white"
+          />
+        </FormControl>
 
-      <Box mb="4">
-        <FormLabel htmlFor="category">Category</FormLabel>
-        <Select id="category" name="category">
-          <option value="general">General Knowledge</option>
-          <option value="science">Science</option>
-          <option value="history">History</option>
-          <option value="sports">Sports</option>
-        </Select>
-      </Box>
+        {/* Category */}
+        <FormControl id="category" isRequired>
+          <FormLabel color="white">Category</FormLabel>
+          <Select
+            placeholder="Select category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            bg="gray.600"
+            color="white"
+          >
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id} style={{ color: 'black' }}>
+                {cat.name}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
 
-      <Box mb="4">
-        <FormLabel htmlFor="difficulty">Difficulty</FormLabel>
-        <Select id="difficulty" name="difficulty">
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </Select>
-      </Box>
+        {/* Difficulty */}
+        <FormControl id="difficulty" isRequired>
+          <FormLabel color="white">Difficulty</FormLabel>
+          <Select
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
+            bg="gray.600"
+            color="white"
+          >
+            <option value="easy" style={{ color: 'black' }}>Easy</option>
+            <option value="medium" style={{ color: 'black' }}>Medium</option>
+            <option value="hard" style={{ color: 'black' }}>Hard</option>
+          </Select>
+        </FormControl>
 
-      <Box mb="4">
-        <FormLabel htmlFor="type">Type</FormLabel>
-        <Select id="type" name="type">
-          <option value="multiple">Multiple Choice</option>
-          <option value="boolean">True/False</option>
-        </Select>
-      </Box>
+        {/* Type */}
+        <FormControl id="type" isRequired>
+          <FormLabel color="white">Type</FormLabel>
+          <Select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            bg="gray.600"
+            color="white"
+          >
+            <option value="multiple" style={{ color: 'black' }}>Multiple Choice</option>
+            <option value="boolean" style={{ color: 'black' }}>True/False</option>
+          </Select>
+        </FormControl>
 
-      <Box mb="4">
-        <FormLabel htmlFor="time">Time</FormLabel>
-        <Select id="time" name="time">
-          <option value="1m">1 minute</option>
-          <option value="2m">2 minutes</option>
-          <option value="5m">5 minutes</option>
-        </Select>
-      </Box>
+        {/* Time */}
+        <FormControl id="time" isRequired>
+          <FormLabel color="white">Time (minutes)</FormLabel>
+          <Select
+            value={time}
+            onChange={(e) => setTime(parseInt(e.target.value))}
+            bg="gray.600"
+            color="white"
+          >
+            <option value={60} style={{ color: 'black' }}>1 Minute</option>
+            <option value={120} style={{ color: 'black' }}>2 Minutes</option>
+            <option value={300} style={{ color: 'black' }}>5 Minutes</option>
+          </Select>
+        </FormControl>
 
-      <Flex justify="space-between" mt="4">
-        <Button colorScheme="blue" onClick={handleStartQuiz}>Start Quiz</Button>
-        <Button colorScheme="blue" variant="outline" onClick={handlSeeStats}>
+        {/* Start Quiz Button */}
+        <Button colorScheme="blue" onClick={handleStartQuiz}>
+          Start Quiz
+        </Button>
+
+        {/* See Statistics Button */}
+        <Button colorScheme="teal" onClick={() => navigate('/results')}>
           See My Statistics
         </Button>
-      </Flex>
+      </VStack>
     </Box>
-  )
-}
+  );
+};
 
 export default Settings;

@@ -1,72 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Heading,
-  Button,
-  Flex,
-  Progress,
-  VStack,
-  Text,
-  SimpleGrid,
-  useDisclosure,
-} from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { Box, Button, Text, VStack, Progress } from '@chakra-ui/react';
+import { clearQuiz, fetchQuestions } from '../../store/slices/quizSlice';
 
 export const QuizPage = () => {
-  const [timer, setTimer] = useState(60); 
-  const [questionNumber, setQuestionNumber] = useState(3); 
-  const [totalQuestions] = useState(6); 
-  const [answers] = useState(['True', 'False']); 
-  
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const onClose = () =>{
-    navigate('/results');
-  }
+  const { questions, config } = useSelector((state) => state.quiz);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(config.time || 60); // Use the time from the config or default to 60 seconds.
 
   useEffect(() => {
-    if (timer === 0) return;
-    const interval = setInterval(() => {
-      setTimer((prev) => prev - 1);
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [timer]);
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      navigate('/results');
+    }
+
+    return () => clearInterval(timer);
+  }, [timeLeft, navigate]);
+
+  const currentQuestion = questions[currentQuestionIndex];
+
+  const handleAnswer = (answer) => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    } else {
+      navigate('/results');
+    }
+  };
+
+  const handleEndQuiz = () => {
+    navigate('/results');
+  };
 
   return (
-    <Box maxW="800px" mx="auto" p="20px">
-      <VStack spacing="4" align="stretch">
-        <Heading as="h1" size="lg">
-          Question {questionNumber} of {totalQuestions}
-        </Heading>
+    <Box>
+      {currentQuestion && (
+        <VStack spacing="4">
+          <Text>Question {currentQuestionIndex + 1} of {questions.length}</Text>
 
-        <Text fontSize="lg">What is the capital of France?</Text>
+          <Progress value={(currentQuestionIndex + 1) / questions.length * 100} size="lg" colorScheme="blue" />
 
-        <Progress
-          value={(questionNumber / totalQuestions) * 100}
-          size="sm"
-          colorScheme="blue"
-          mb="4"
-        />
+          <Text>{currentQuestion.question}</Text>
 
-        <SimpleGrid columns={2} spacing="4" mb="4">
-          {answers.map((answer, index) => (
-            <Button key={index} colorScheme="teal">
-              {answer}
-            </Button>
-          ))}
-        </SimpleGrid>
+          {currentQuestion.type === 'boolean' ? (
+            <VStack>
+              <Button onClick={() => handleAnswer('True')}>True</Button>
+              <Button onClick={() => handleAnswer('False')}>False</Button>
+            </VStack>
+          ) : (
+            <VStack>
+              {currentQuestion.incorrect_answers.concat(currentQuestion.correct_answer).map((answer, index) => (
+                <Button key={index} onClick={() => handleAnswer(answer)}>
+                  {answer}
+                </Button>
+              ))}
+            </VStack>
+          )}
 
-        <Button colorScheme="red" onClick={onClose}>
-          End Quiz
-        </Button>
+          <Text>Time Left: {timeLeft}s</Text>
 
-        <Text fontSize="lg" mt="4">
-          Time Left: {Math.floor(timer / 60)}:{timer % 60 < 10 ? `0${timer % 60}` : timer % 60}
-        </Text>
-      </VStack>
+          <Button onClick={handleEndQuiz} colorScheme="red">End Quiz</Button>
+        </VStack>
+      )}
     </Box>
   );
-}
+};
 
 export default QuizPage;
