@@ -9,6 +9,12 @@ export const ResultsPage = () => {
   const navigate = useNavigate();
   const { questions, config } = useSelector((state) => state.quiz);
 
+  const { results } = useSelector((state) => state.quiz);
+
+  if (!results) {
+    return <Text>No results available</Text>;
+  }
+
   const handleRestartQuiz = () => {
     dispatch(fetchQuestions(config)).then(() => {
       navigate('/quiz');
@@ -20,13 +26,14 @@ export const ResultsPage = () => {
     navigate('/');
   };
 
+  const { correctAnswers, totalQuestions, timeTaken } = results;
+
   return (
     <Box>
       <VStack spacing="4">
-        <Text>Thank you for completing the quiz!</Text>
-        <Text>
-          You answered {questions.filter((q) => q.correct_answer).length} out of {questions.length} questions correctly.
-        </Text>
+      <Text>Thank you for completing this quiz. Here are your results:</Text>
+      <Text>You answered {correctAnswers} out of {totalQuestions} questions correctly.</Text>
+      <Text>You took {timeTaken} seconds to complete the quiz.</Text>
 
         <Button onClick={handleRestartQuiz}>Restart Quiz</Button>
         <Button onClick={handleChooseAnotherQuiz}>Choose Another Quiz</Button>

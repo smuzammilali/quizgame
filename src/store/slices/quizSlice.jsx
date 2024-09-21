@@ -33,6 +33,7 @@ const quizSlice = createSlice({
         type: 'multiple',
         time: 60, 
       }, 
+    results: null,
     loading: false,
     error: null,
   },
@@ -43,15 +44,19 @@ const quizSlice = createSlice({
       setQuestions: (state, action) => {
         state.questions = action.payload;
       },
+      setResults: (state, action) => {
+        state.results = action.payload;
+      },
       clearQuiz: (state) => {
         state.questions = [];
         state.config = {
-            numQuestions: 5,
-            category: '',
-            difficulty: 'easy',
-            type: 'multiple',
-            time: 60, 
-          } 
+          numQuestions: 5,
+          category: '',
+          difficulty: 'easy',
+          type: 'multiple',
+          time: 60, 
+        };
+        state.results = null;
       },
   },
   extraReducers: (builder) => {
@@ -71,6 +76,6 @@ const quizSlice = createSlice({
   },
 });
 
-export const { setQuizConfig, setQuestions, clearQuiz } = quizSlice.actions;
+export const { setQuizConfig, setQuestions, setResults, clearQuiz } = quizSlice.actions;
 
 export default quizSlice.reducer;
